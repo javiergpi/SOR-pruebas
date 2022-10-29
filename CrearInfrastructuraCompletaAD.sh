@@ -134,12 +134,13 @@ AWS_EC2_INSTANCE_ID=$(aws ec2 run-instances \
   --image-id $AWS_AMI_ID \
   --instance-type t2.medium \
   --key-name $AWS_Nombre_Estudiante \
+  --user-data file://UserDataServidor.txt \
   --monitoring "Enabled=false" \
   --security-group-ids $AWS_CUSTOM_SECURITY_GROUP_ID \
   --subnet-id $AWS_ID_SubredPublica \
   --private-ip-address $AWS_IP_Servidor \
   --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=SOR-SERVIDOR}]' \
-  --user-data file://UserDataServidor.ps1 \ 
+ 
   --query 'Instances[0].InstanceId' \
   --output text)
 
