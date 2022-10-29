@@ -139,6 +139,7 @@ AWS_EC2_INSTANCE_ID=$(aws ec2 run-instances \
   --subnet-id $AWS_ID_SubredPublica \
   --private-ip-address $AWS_IP_Servidor \
   --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=SOR-SERVIDOR}]' \
+  --user-data file://UserDataServidor.ps1
   --query 'Instances[0].InstanceId' \
   --output text)
 
@@ -161,7 +162,6 @@ AWS_EC2_INSTANCE_ID2=$(aws ec2 run-instances \
   --private-ip-address $AWS_IP_Cliente \
   --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=SOR-CLIENTE}]' \
   --query 'Instances[0].InstanceId' \
-  --user-data file://UserDataServidor.ps1
   --output text)
 
 ## Mostrar la ip publica de la instancia
