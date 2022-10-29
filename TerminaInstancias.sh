@@ -19,7 +19,7 @@
 
 
  # get default vpc
-  vpc=$( aws ec2  describe-vpcs --filter Name=isDefault,Values=true --output text --query 'Vpcs[0].VpcId' )
+  vpc=$( aws ec2  describe-vpcs  --output text --query 'Vpcs[0].VpcId' )
   if [ "${vpc}" = "None" ]; then
     echo "${INDENT}No default vpc found"
     continue
