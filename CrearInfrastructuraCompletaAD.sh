@@ -139,7 +139,7 @@ AWS_EC2_INSTANCE_ID=$(aws ec2 run-instances \
   --subnet-id $AWS_ID_SubredPublica \
   --private-ip-address $AWS_IP_Servidor \
   --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=SOR-SERVIDOR}]' \
-  --user-data file://UserDataServidor.ps1
+  --user-data file://UserDataServidor.ps1 \ 
   --query 'Instances[0].InstanceId' \
   --output text)
 
