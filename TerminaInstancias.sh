@@ -6,7 +6,7 @@
 
 
 # Borra todas las instancias
-  aws ec2 describe-instances --instance-state-name "running" | \
+  aws ec2 describe-instances --filters instance-state-name="running" | \
     jq -r .Reservations[].Instances[].InstanceId | \
       xargs -L 1 -I {} aws ec2 modify-instance-attribute \
         --no-disable-api-termination \
