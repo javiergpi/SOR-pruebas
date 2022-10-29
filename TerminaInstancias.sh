@@ -15,7 +15,6 @@
     jq -r .Reservations[].Instances[].InstanceId | \
       xargs -L 1 -I {} aws ec2 terminate-instances \
         --instance-id {}
- done
 
 
 
