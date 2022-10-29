@@ -5,7 +5,8 @@
 ###########################################################
 
 
-  aws ec2 describe-instances | \
+# Borra todas las instancias
+  aws ec2 describe-instances --instance-state-name "running" | \
     jq -r .Reservations[].Instances[].InstanceId | \
       xargs -L 1 -I {} aws ec2 modify-instance-attribute \
         --no-disable-api-termination \
@@ -13,6 +14,16 @@
   aws ec2 describe-instances  | \
     jq -r .Reservations[].Instances[].InstanceId | \
       xargs -L 1 -I {} aws ec2 terminate-instances \
-       \
         --instance-id {}
 done
+
+
+
+#  vpc=$(aws ec2 --region ${region} \
+#     describe-vpcs --filter Name=isDefault,Values=true \
+#     | jq -r .Vpcs[0].VpcId)
+#   if [ "${vpc}" = "null" ]; then
+#     echo "No default vpc found"
+#     continue
+#   fi
+#   echo "Found default vpc ${vpc}"
