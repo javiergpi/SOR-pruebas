@@ -2,6 +2,14 @@ $DNS_DOMINIO="dominiprofe.local"
 $NETBIOS_DOMINIO="DOMINIOPROFE"
 $URL_REPOSITORIO="https://github.com/javiergpi/SOR.git"
 
+
+#Eliminamos el registro de la tarea programada
+ $exists = Get-ScheduledTask | Where-Object {$_.TaskName -like 'ConfiguraAD'}
+ if($exists){
+    Unregister-ScheduledTask -TaskName 'ConfiguraAD' -Confirm:$false
+ }
+
+
 #
 # Configuramos AD
 #

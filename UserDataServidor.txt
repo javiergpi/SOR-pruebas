@@ -1,22 +1,25 @@
 
 <powershell>
 
-$NOMBRE_SERVIDOR="SERVIDOR-PROFE"
-$DNS_DOMINIO="dominiprofe.local"
-$NETBIOS_DOMINIO="DOMINIOPROFE"
-$URL_REPOSITORIO="https://github.com/javiergpi/SOR.git"
+
 
 
 #Abrimos las reglas del Firewall para permitir PING
-New-NetFirewallRule -DisplayName "Allow inbound ICMPv4" -Direction Inbound -Protocol ICMPv4 -IcmpType 8 -RemoteAddress <localsubnet> -Action Allow
-New-NetFirewallRule -DisplayName "Allow inbound ICMPv6" -Direction Inbound -Protocol ICMPv6 -IcmpType 8 -RemoteAddress <localsubnet> -Action Allow
-New-NetFirewallRule -DisplayName "Allow outbound ICMPv4" -Direction Outbound -Protocol ICMPv4 -IcmpType 8 -RemoteAddress <localsubnet> -Action Allow
-New-NetFirewallRule -DisplayName "Allow outbound ICMPv6" -Direction Outbound -Protocol ICMPv6 -IcmpType 8 -RemoteAddress <localsubnet> -Action Allow
+echo "....Abriendo reglas de Firewall...."
+New-NetFirewallRule -DisplayName "Allow inbound ICMPv4" -Direction Inbound -Protocol ICMPv4 -IcmpType 8  -Action Allow
+New-NetFirewallRule -DisplayName "Allow inbound ICMPv6" -Direction Inbound -Protocol ICMPv6 -IcmpType 8  -Action Allow
+New-NetFirewallRule -DisplayName "Allow outbound ICMPv4" -Direction Outbound -Protocol ICMPv4 -IcmpType 8  -Action Allow
+New-NetFirewallRule -DisplayName "Allow outbound ICMPv6" -Direction Outbound -Protocol ICMPv6 -IcmpType 8  -Action Allow
+echo "....Abiertas reglas de Firewall...."
+
+
 
 #Instalamos rol AD
+echo "....Instalando rol AD...."
 Install-windowsfeature -name AD-Domain-Services -IncludeManagementTools
+echo "....Instalado rol AD...."
 
-
+echo "....Instalando choco y git...."
 # Modo unrestricted para powershell
 Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force
 
@@ -25,26 +28,45 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 
 # Instalamos Git
 choco install git.install -y
+echo "....Instalado choco y git...."
+
 
 #Clonamos el repositorio remoto
-git clone $URL_REPOSITORIO
+echo "....Clonando repositorio remoto...."
+ 
+if (Test-Path "SOR"){
+    Remove-Item "SOR" -Recurse -Force
+}
 
-$action=New-ScheduledTaskAction -Execute "ConfiguraAD.ps1"
-$trigger = New-ScheduledTaskTrigger -AtLogon
-$principal = "Administrator"
-$settings = New-ScheduledTaskSettingsSet
-$task = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Settings $settings
-Register-ScheduledTask T1 -InputObject $task
+Start-Process git -ArgumentList 'clone $URL_REPOSITORIO'
+echo "Clonado repositorio remoto"
+pause
 
+echo "....Clonado repositorio remoto...."
+
+
+# Creamos tarea programada para promocionar a PDC tras reinicio"
+echo "....Registrando tarea programada...."
+$rutaScript= $PSScriptRoot+"\"+$script
+
+ $exists = Get-ScheduledTask | Where-Object {$_.TaskName -like 'ConfiguraAD'}
+ if($exists){
+    Unregister-ScheduledTask -TaskName 'ConfiguraAD' -Confirm:$false
+ }
+
+$Action = New-ScheduledTaskAction -Execute 'Powershell' -Argument '-NonInteractive -NoLogo -NoProfile -File "$rutaScript"'
+$Trigger = New-ScheduledTaskTrigger -AtLogon
+$Settings = New-ScheduledTaskSettingsSet
+$Task = New-ScheduledTask -Action $Action -Trigger $Trigger -Settings $Settings
+
+Register-ScheduledTask -TaskName 'ConfiguraAD' -InputObject $Task -User $USUARIO -Password $PASSWORD
+echo "Registrada tarea programada"
 
 #Renombramos el servidor
-Rename-Computer -ComputerName  -NewName $NOMBRE_SERVIDOR 
-Restart-Computer -Wait
+echo "....Renombramos y reiniciamos...."
 
-
-
-
-
+Rename-Computer -NewName $NOMBRE_SERVIDOR 
+Restart-Computer 
 
 
 </powershell>

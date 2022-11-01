@@ -4,16 +4,53 @@
 #       grupo de seguridad y dos instancias EC2 Windows 2022 (SERVIDOR Y CLIENTE)
 #      en AWS con AWS CLI
 #  Autor: Javier González Pisano (basado en Javier Terán González)
-#  Fecha: 23/10/2022
+#  Fecha: 01/10/2022
 ###########################################################
 
-## Definición de variables
+#SECCION DE VARIABLES: A CUSTOMIZAR POR EL ALUMNO
+
+# VARIABLES AWS
+
+#CIDR de la VPC
 AWS_VPC_CIDR_BLOCK=192.168.66.0/24
+
+#CIDR de la subred pública (deber ser subconjunto de la anterior)
 AWS_Subred_CIDR_BLOCK=192.168.66.0/24
+
+#Dirección privada del PDC en la subred pública
 AWS_IP_Servidor=192.168.66.100
+
+#Dirección privada del cliente en la subred pública
 AWS_IP_Cliente=192.168.66.200
 
-AWS_Nombre_Estudiante="javier" #usado para la clave
+# Nombre de la clave usada para generar contraseñas
+AWS_Nombre_Clave="javier" 
+
+# VARIABLES PDC (NECESARIAS PARA CONFIGURACION PDC)
+
+#Nombre del PDC
+$Nombre_Servidor="SERVIDOR-PROFE"
+
+#Usuario administrador en el PDC
+$Admin_Servidor="javier"
+
+#Password del administrador en el PDC (sacar a partir de la clave .pem) [INSERGURO]
+$Password_Servidor="Naranco.22" #Inseguro
+
+#Nombre DNS del dominio
+$DNS_Dominio"dominioprofe.local"
+
+#Nombre NETBIOS del dominio. Pondremos el DNS sin el sufijo y en mayúsculas, por covnención
+$NETBIOS_DOMINIO="DOMINIOPROFE"
+
+#URL Repositorio (no tocar)
+$URL_REPOSITORIO="https://github.com/javiergpi/SOR.git"
+
+#Script para promocion PDC (no tocar)
+$script="PromocionaPDC.ps1"
+
+
+
 
 ## Crear una VPC (Virtual Private Cloud) con su etiqueta
 ## La VPC tendrá un bloque IPv4 proporcionado por el usuario y uno IPv6 de AWS
