@@ -1,7 +1,11 @@
 
 <powershell>
-#Renombramos el servidor
-Rename-Computer -ComputerName  -NewName "SERVIDOR-NN" 
+
+$NOMBRE_SERVIDOR="SERVIDOR-PROFE"
+$DNS_DOMINIO="dominiprofe.local"
+$NETBIOS_DOMINIO="DOMINIOPROFE"
+$URL_REPOSITORIO="https://github.com/javiergpi/SOR.git"
+
 
 #Abrimos las reglas del Firewall para permitir PING
 New-NetFirewallRule -DisplayName "Allow inbound ICMPv4" -Direction Inbound -Protocol ICMPv4 -IcmpType 8 -RemoteAddress <localsubnet> -Action Allow
@@ -9,29 +13,38 @@ New-NetFirewallRule -DisplayName "Allow inbound ICMPv6" -Direction Inbound -Prot
 New-NetFirewallRule -DisplayName "Allow outbound ICMPv4" -Direction Outbound -Protocol ICMPv4 -IcmpType 8 -RemoteAddress <localsubnet> -Action Allow
 New-NetFirewallRule -DisplayName "Allow outbound ICMPv6" -Direction Outbound -Protocol ICMPv6 -IcmpType 8 -RemoteAddress <localsubnet> -Action Allow
 
-
-
 #Instalamos rol AD
 Install-windowsfeature -name AD-Domain-Services -IncludeManagementTools
 
 
-#
-# Configuramos AD
-#
+# Modo unrestricted para powershell
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force
 
-Import-Module ADDSDeployment
-Install-ADDSForest `
--CreateDnsDelegation:$false `
--DatabasePath "C:\Windows\NTDS" `
--DomainMode "WinThreshold" `
--DomainName "dominioPROFE.local" `
--DomainNetbiosName "DOMINIOPROFE" `
--ForestMode "WinThreshold" `
--InstallDns:$true `
--LogPath "C:\Windows\NTDS" `
--NoRebootOnCompletion:$false `
--SysvolPath "C:\Windows\SYSVOL" `
--Force:$true
+# Instalamos Choco para la posterior instalación de Git
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')) 
+
+# Instalamos Git
+choco install git.install -y
+
+#Clonamos el repositorio remoto
+git clone $URL_REPOSITORIO
+
+$action=New-ScheduledTaskAction -Execute "ConfiguraAD.ps1"
+$trigger = New-ScheduledTaskTrigger -AtLogon
+$principal = "Administrator"
+$settings = New-ScheduledTaskSettingsSet
+$task = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Settings $settings
+Register-ScheduledTask T1 -InputObject $task
+
+
+#Renombramos el servidor
+Rename-Computer -ComputerName  -NewName $NOMBRE_SERVIDOR 
+Restart-Computer -Wait
+
+
+
+
+
 
 
 </powershell>
