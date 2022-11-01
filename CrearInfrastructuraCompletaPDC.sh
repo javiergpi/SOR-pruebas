@@ -36,7 +36,7 @@ Nombre_Servidor="SERVIDOR-PROFE"
 Admin_Servidor="javier"
 
 #Password del administrador en el PDC (sacar a partir de la clave .pem) [INSERGURO]
-Password_Servidor="Naranco.22" #Inseguro
+Password_Servidor="Naranco.22"
 
 #Nombre DNS del dominio
 DNS_Dominio"dominioprofe.local"
