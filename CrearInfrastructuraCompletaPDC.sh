@@ -39,7 +39,7 @@ Admin_Servidor="javier"
 Password_Servidor="Naranco.22"
 
 #Nombre DNS del dominio
-DNS_Dominio"dominioprofe.local"
+DNS_Dominio="dominioprofe.local"
 
 #Nombre NETBIOS del dominio. Pondremos el DNS sin el sufijo y en mayúsculas, por covnención
 NETBIOS_DOMINIO="DOMINIOPROFE"
