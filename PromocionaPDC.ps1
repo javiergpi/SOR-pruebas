@@ -1,4 +1,4 @@
-$DNS_DOMINIO="dominiprofe.local"
+$DNS_DOMINIO="dominioprofe.local"
 $NETBIOS_DOMINIO="DOMINIOPROFE"
 $URL_REPOSITORIO="https://github.com/javiergpi/SOR.git"
 
