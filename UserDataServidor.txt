@@ -1,5 +1,4 @@
 
-<powershell>
 
 
 
@@ -68,5 +67,3 @@ echo "....Renombramos y reiniciamos...."
 Rename-Computer -NewName $NOMBRE_SERVIDOR 
 Restart-Computer 
 
-
-</powershell>

@@ -48,7 +48,7 @@ NETBIOS_DOMINIO="DOMINIOPROFE"
 URL_REPOSITORIO="https://github.com/javiergpi/SOR.git"
 
 #Script para promocion PDC (no tocar)
-script="PromocionaPDC.ps1"
+SCRIPT_PDC="PromocionaPDC.ps1"
 
 ## Crear una VPC (Virtual Private Cloud) con su etiqueta
 ## La VPC tendrá un bloque IPv4 proporcionado por el usuario y uno IPv6 de AWS
@@ -139,41 +139,49 @@ AWS_DHCP_OPTIONS_ID=$(aws ec2 create-dhcp-options \
     --query 'DhcpOptions.{DhcpOptionsId:DhcpOptionsId}' \
   --output text)
 
-
-
 ## Asgignar el conjunto de opciones DHCP al VPC
 aws ec2 associate-dhcp-options --dhcp-options-id $AWS_DHCP_OPTIONS_ID --vpc-id $AWS_ID_VPC
 
 
-####################################
+###################################
 
-# echo "Creando grupo de seguridad..."
-# ## Crear un grupo de seguridad
-# aws ec2 create-security-group \
-#   --vpc-id $AWS_ID_VPC \
-#   --group-name SOR-Windows-SG \
-#   --description 'SOR-Windows-SG'
-
-
-# AWS_CUSTOM_SECURITY_GROUP_ID=$(aws ec2 describe-security-groups \
-#   --filters "Name=vpc-id,Values=$AWS_ID_VPC" \
-#   --query 'SecurityGroups[?GroupName == `SOR-Windows-SG`].GroupId' \
-#   --output text)
-
-# ## Abrir los puertos de acceso a la instancia
-# aws ec2 authorize-security-group-ingress \
-#   --group-id $AWS_CUSTOM_SECURITY_GROUP_ID \
-#   --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3389, "ToPort": 3389, "IpRanges": [{"CidrIp": "0.0.0.0/0", "Description": "Allow RDP"}]}]'
+echo "Creando grupo de seguridad..."
+## Crear un grupo de seguridad
+aws ec2 create-security-group \
+  --vpc-id $AWS_ID_VPC \
+  --group-name SOR-Windows-SG \
+  --description 'SOR-Windows-SG'
 
 
-# ## Añadirle etiqueta al grupo de seguridad
-# aws ec2 create-tags \
-# --resources $AWS_CUSTOM_SECURITY_GROUP_ID \
-# --tags "Key=Name,Value=SOR-Windows-SG" 
+AWS_CUSTOM_SECURITY_GROUP_ID=$(aws ec2 describe-security-groups \
+  --filters "Name=vpc-id,Values=$AWS_ID_VPC" \
+  --query 'SecurityGroups[?GroupName == `SOR-Windows-SG`].GroupId' \
+  --output text)
 
-# ## aws ec2 create-key-pair --key-name 'clave-SOR'
+## Abrir los puertos de acceso a la instancia
+aws ec2 authorize-security-group-ingress \
+  --group-id $AWS_CUSTOM_SECURITY_GROUP_ID \
+  --ip-permissions '[{"IpProtocol": "tcp", "FromPort": 3389, "ToPort": 3389, "IpRanges": [{"CidrIp": "0.0.0.0/0", "Description": "Allow RDP"}]}]'
 
-# ## Crear una instancia EC2  (con una imagen Windows Server 2022 Base )
+
+## Añadirle etiqueta al grupo de seguridad
+aws ec2 create-tags \
+--resources $AWS_CUSTOM_SECURITY_GROUP_ID \
+--tags "Key=Name,Value=SOR-Windows-SG" 
+
+
+
+## Crear una instancia EC2  (con una imagen Windows Server 2022 Base )
+
+BASEDIR=$(cd $(dirname $0) && pwd)
+
+
+sed -i "1 i\$SCRIPT_PDC=\"${SCRIPT_PDC}\" \n" "${BASEDIR}/UserDataServidor.txt"
+sed -i "1 i\$URL_REPOSITORIO=\"${URL_REPOSITORIO}\" \n" "${BASEDIR}/UserDataServidor.txt"
+sed -i "1 i\$NETBIOS_DOMINIO=\"${NETBIOS_DOMINIO}\" \n" "${BASEDIR}/UserDataServidor.txt"
+sed -i "1 i\$DNS_DOMINIO=\"${DNS_Dominio}\" \n" "${BASEDIR}/UserDataServidor.txt"
+sed -i '1s/^/<powershell> \n /' "${BASEDIR}/UserDataServidor.txt"
+sed -i "$ a </powershell> \n"  "${BASEDIR}/UserDataServidor.txt"
 
 # echo "Creando instancia SERVIDOR..."
 # AWS_AMI_ID=ami-07a53499a088e4a8c 
