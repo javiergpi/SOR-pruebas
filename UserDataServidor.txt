@@ -1,10 +1,23 @@
+###########################################################
+#       UserDataServidor.txt
+#       Llamado desde CreaInfrastructuraCompletaPDC.sh
+#       Es el archivo que pasamos como UserData al servidor que será el PDC
+#       Las variables se rellenan desde dicho script.
+#  Autor: Javier González Pisano 
+#  Fecha: 02/11/2022
+###########################################################
 
-
-
+# Las variables importadas son:
+# SCRIPT_PDC
+# URL_REPOSITORIO
+# NETBIOS_DOMINIO
+# DNS_DOMINIO
+# ADMIN_SERVIDOR
+# PASSWORD_SERVIDOR
 
 
 #Abrimos las reglas del Firewall para permitir PING
-echo "....Abriendo reglas de Firewall...."
+echo "1....Abriendo reglas de Firewall...."
 New-NetFirewallRule -DisplayName "Allow inbound ICMPv4" -Direction Inbound -Protocol ICMPv4 -IcmpType 8  -Action Allow
 New-NetFirewallRule -DisplayName "Allow inbound ICMPv6" -Direction Inbound -Protocol ICMPv6 -IcmpType 8  -Action Allow
 New-NetFirewallRule -DisplayName "Allow outbound ICMPv4" -Direction Outbound -Protocol ICMPv4 -IcmpType 8  -Action Allow
@@ -53,12 +66,14 @@ $rutaScript= $PSScriptRoot+"\"+$script
     Unregister-ScheduledTask -TaskName 'ConfiguraAD' -Confirm:$false
  }
 
-$Action = New-ScheduledTaskAction -Execute 'Powershell' -Argument '-NonInteractive -NoLogo -NoProfile -File "$rutaScript"'
+
+
+$Action = New-ScheduledTaskAction -Execute 'Powershell' -Argument "-NonInteractive -NoLogo -NoProfile -File $rutaScript $DNS_DOMINIO NETBIOS_DOMINIO"
 $Trigger = New-ScheduledTaskTrigger -AtLogon
 $Settings = New-ScheduledTaskSettingsSet
 $Task = New-ScheduledTask -Action $Action -Trigger $Trigger -Settings $Settings
 
-Register-ScheduledTask -TaskName 'ConfiguraAD' -InputObject $Task -User $USUARIO -Password $PASSWORD
+Register-ScheduledTask -TaskName 'ConfiguraAD' -InputObject $Task -User $ADMIN_SERVIDOR -Password $PASSWORD_SERVIDOR
 echo "Registrada tarea programada"
 
 #Renombramos el servidor

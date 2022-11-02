@@ -1,6 +1,6 @@
-$DNS_DOMINIO="dominioprofe.local"
-$NETBIOS_DOMINIO="DOMINIOPROFE"
-$URL_REPOSITORIO="https://github.com/javiergpi/SOR.git"
+$DNS_DOMINIO=$args[0];
+$NETBIOS_DOMINIO=$args[1];
+
 
 
 #Eliminamos el registro de la tarea programada

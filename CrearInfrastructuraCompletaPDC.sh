@@ -5,7 +5,7 @@
 #      en AWS con AWS CLI
 
 #  Autor: Javier González Pisano (basado en Javier Terán González)
-#  Fecha: 23/10/2022
+#  Fecha: 02/11/2022
 ###########################################################
 
 #SECCION DE VARIABLES: A CUSTOMIZAR POR EL ALUMNO
@@ -180,51 +180,53 @@ sed -i "1 i\$SCRIPT_PDC=\"${SCRIPT_PDC}\" \n" "${BASEDIR}/UserDataServidor.txt"
 sed -i "1 i\$URL_REPOSITORIO=\"${URL_REPOSITORIO}\" \n" "${BASEDIR}/UserDataServidor.txt"
 sed -i "1 i\$NETBIOS_DOMINIO=\"${NETBIOS_DOMINIO}\" \n" "${BASEDIR}/UserDataServidor.txt"
 sed -i "1 i\$DNS_DOMINIO=\"${DNS_Dominio}\" \n" "${BASEDIR}/UserDataServidor.txt"
+sed -i "1 i\$ADMIN_SERVIDOR=\"${Admin_Servidor}\" \n" "${BASEDIR}/UserDataServidor.txt"
+sed -i "1 i\$PASSWORD_SERVIDOR=\"${Password_Servidor}\" \n" "${BASEDIR}/UserDataServidor.txt"
 sed -i '1s/^/<powershell> \n /' "${BASEDIR}/UserDataServidor.txt"
 sed -i "$ a </powershell> \n"  "${BASEDIR}/UserDataServidor.txt"
 
-# echo "Creando instancia SERVIDOR..."
-# AWS_AMI_ID=ami-07a53499a088e4a8c 
-# AWS_EC2_INSTANCE_ID=$(aws ec2 run-instances \
-#   --image-id $AWS_AMI_ID \
-#   --instance-type t2.medium \
-#   --key-name $AWS_Nombre_Estudiante \
-#   --user-data file://UserDataServidor.txt \
-#   --monitoring "Enabled=false" \
-#   --security-group-ids $AWS_CUSTOM_SECURITY_GROUP_ID \
-#   --subnet-id $AWS_ID_SubredPublica \
-#   --private-ip-address $AWS_IP_Servidor \
-#   --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=SOR-SERVIDOR}]' \
-#   --query 'Instances[0].InstanceId' \
-#   --output text)
+echo "Creando instancia SERVIDOR..."
+AWS_AMI_ID=ami-07a53499a088e4a8c 
+AWS_EC2_INSTANCE_ID=$(aws ec2 run-instances \
+  --image-id $AWS_AMI_ID \
+  --instance-type t2.medium \
+  --key-name $AWS_Nombre_Estudiante \
+  --user-data file://UserDataServidor.txt \
+  --monitoring "Enabled=false" \
+  --security-group-ids $AWS_CUSTOM_SECURITY_GROUP_ID \
+  --subnet-id $AWS_ID_SubredPublica \
+  --private-ip-address $AWS_IP_Servidor \
+  --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=SOR-SERVIDOR}]' \
+  --query 'Instances[0].InstanceId' \
+  --output text)
 
-# ## Mostrar la ip publica de la instancia
-#  AWS_EC2_INSTANCE_PUBLIC_IP=$(aws ec2 describe-instances \
-#  --filters "Name=instance-id,Values="$AWS_EC2_INSTANCE_ID \
-#  --query "Reservations[*].Instances[*].PublicIpAddress" \
-#  --output=text) &&
-#  echo "Creada instancia servidor con IP " $AWS_EC2_INSTANCE_PUBLIC_IP
+## Mostrar la ip publica de la instancia
+ AWS_EC2_INSTANCE_PUBLIC_IP=$(aws ec2 describe-instances \
+ --filters "Name=instance-id,Values="$AWS_EC2_INSTANCE_ID \
+ --query "Reservations[*].Instances[*].PublicIpAddress" \
+ --output=text) &&
+ echo "Creada instancia servidor con IP " $AWS_EC2_INSTANCE_PUBLIC_IP
 
-# echo "Creando instancia CLIENTE..."
-# AWS_AMI_ID=ami-07a53499a088e4a8c
-# AWS_EC2_INSTANCE_ID2=$(aws ec2 run-instances \
-#   --image-id $AWS_AMI_ID \
-#   --instance-type t2.small \
-#   --key-name "$AWS_Nombre_Estudiante" \
-#   --monitoring "Enabled=false" \
-#   --security-group-ids $AWS_CUSTOM_SECURITY_GROUP_ID \
-#   --subnet-id $AWS_ID_SubredPublica \
-#   --private-ip-address $AWS_IP_Cliente \
-#   --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=SOR-CLIENTE}]' \
-#   --query 'Instances[0].InstanceId' \
-#   --output text)
+echo "Creando instancia CLIENTE..."
+AWS_AMI_ID=ami-07a53499a088e4a8c
+AWS_EC2_INSTANCE_ID2=$(aws ec2 run-instances \
+  --image-id $AWS_AMI_ID \
+  --instance-type t2.small \
+  --key-name "$AWS_Nombre_Estudiante" \
+  --monitoring "Enabled=false" \
+  --security-group-ids $AWS_CUSTOM_SECURITY_GROUP_ID \
+  --subnet-id $AWS_ID_SubredPublica \
+  --private-ip-address $AWS_IP_Cliente \
+  --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=SOR-CLIENTE}]' \
+  --query 'Instances[0].InstanceId' \
+  --output text)
 
-# ## Mostrar la ip publica de la instancia
-#  AWS_EC2_INSTANCE_PUBLIC_IP=$(aws ec2 describe-instances \
-#  --filters "Name=instance-id,Values="$AWS_EC2_INSTANCE_ID2 \
-#  --query "Reservations[*].Instances[*].PublicIpAddress" \
-#  --output=text) &&
-#  echo "Creada instancia cliente con IP " $AWS_EC2_INSTANCE_PUBLIC_IP
+## Mostrar la ip publica de la instancia
+ AWS_EC2_INSTANCE_PUBLIC_IP=$(aws ec2 describe-instances \
+ --filters "Name=instance-id,Values="$AWS_EC2_INSTANCE_ID2 \
+ --query "Reservations[*].Instances[*].PublicIpAddress" \
+ --output=text) &&
+ echo "Creada instancia cliente con IP " $AWS_EC2_INSTANCE_PUBLIC_IP
 
 
-# ## aws ec2 describe-addresses
+## aws ec2 describe-addresses
