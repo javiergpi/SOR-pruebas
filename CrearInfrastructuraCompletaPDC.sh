@@ -190,7 +190,7 @@ AWS_AMI_ID=ami-07a53499a088e4a8c
 AWS_EC2_INSTANCE_ID=$(aws ec2 run-instances \
   --image-id $AWS_AMI_ID \
   --instance-type t2.medium \
-  --key-name $AWS_Nombre_Estudiante \
+  --key-name $AWS_Nombre_Clave \
   --user-data file://UserDataServidor.txt \
   --monitoring "Enabled=false" \
   --security-group-ids $AWS_CUSTOM_SECURITY_GROUP_ID \
@@ -212,7 +212,7 @@ AWS_AMI_ID=ami-07a53499a088e4a8c
 AWS_EC2_INSTANCE_ID2=$(aws ec2 run-instances \
   --image-id $AWS_AMI_ID \
   --instance-type t2.small \
-  --key-name "$AWS_Nombre_Estudiante" \
+  --key-name "$AWS_Nombre_Clave" \
   --monitoring "Enabled=false" \
   --security-group-ids $AWS_CUSTOM_SECURITY_GROUP_ID \
   --subnet-id $AWS_ID_SubredPublica \
