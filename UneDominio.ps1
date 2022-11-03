@@ -3,18 +3,5 @@
 # Debería incluir las variables:
 #   - DNS_DOMINIO
 
-
-Import-Module ADDSDeployment
-Install-ADDSForest `
--CreateDnsDelegation:$false `
--DatabasePath "C:\Windows\NTDS" `
--DomainMode "WinThreshold" `
--DomainName $DNS_DOMINIO `
--DomainNetbiosName $NETBIOS_DOMINIO `
--SafeModeAdministratorPassword (ConvertTo-SecureString -AsPlainText "Naranco.22" -Force) `
--ForestMode "WinThreshold" `
--InstallDns:$true `
--LogPath "C:\Windows\NTDS" `
--NoRebootOnCompletion:$false `
--SysvolPath "C:\Windows\SYSVOL" `
--Force:$true
+$Credenciales = $Host.UI.PromptForCredential("Credenciales", "Escribe credenciales para unirte al dominio", "", $DNS_DOMINIO)
+Add-Computer -DomainName $DNS_DOMINIO -cred $Credenciales

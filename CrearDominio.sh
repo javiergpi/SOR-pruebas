@@ -202,7 +202,7 @@ aws ec2 create-tags \
 
 BASEDIR=$(cd $(dirname $0) && pwd)
 
-sed -i "1 i\$SCRIPT_PDC=\"${SCRIPT_PDC}\" \n" "${BASEDIR}/UserDataPDC.txt"
+sed -i "1 i\$SCRIPT_PDC=\"${Script_PDC}\" \n" "${BASEDIR}/UserDataPDC.txt"
 # Extraemos el nombre del respositorio de la URL
   basename=$(basename $URL_Repositorio)
   Nombre_Repositorio=${basename%.*}
@@ -215,6 +215,14 @@ sed -i '1s/^/<powershell> \n /' "${BASEDIR}/UserDataPDC.txt"
 sed -i "$ a </powershell> \n"  "${BASEDIR}/UserDataPDC.txt"
 
 # Modificamos el archivo UserDataCliente.txt para añadir datos de personalización.
+
+sed -i "1 i\$SCRIPT_CLIENTE=\"${Script_Cliente}\" \n" "${BASEDIR}/UserDataCliente.txt"
+sed -i "1 i\$NOMBRE_REPOSITORIO=\"${Nombre_Repositorio}\" \n" "${BASEDIR}/UserDataCliente.txt"
+sed -i "1 i\$URL_REPOSITORIO=\"${URL_Repositorio}\" \n" "${BASEDIR}/UserDataCliente.txt"
+sed -i "1 i\$DNS_DOMINIO=\"${DNS_Dominio}\" \n" "${BASEDIR}/UserDataCliente.txt"
+sed -i "1 i\$NOMBRE_CLIENTE=\"${Nombre_Cliente}\" \n" "${BASEDIR}/UserDataCliente.txt"
+sed -i '1s/^/<powershell> \n /' "${BASEDIR}/UserDataCliente.txt"
+sed -i "$ a </powershell> \n"  "${BASEDIR}/UserDataCliente.txt"
 
 
 
@@ -248,31 +256,32 @@ aws ec2 create-tags \
 --tags "Key=Name,Value=SOR-SERVIDOR-ip" 
 
 
-# echo "Creando instancia CLIENTE..."
-# AWS_AMI_ID=ami-07a53499a088e4a8c
-# AWS_EC2_INSTANCE_ID2=$(aws ec2 run-instances \
-#   --image-id $AWS_AMI_ID \
-#   --instance-type t2.small \
-#   --key-name "$AWS_Nombre_Clave" \
-#   --monitoring "Enabled=false" \
-#   --security-group-ids $AWS_CUSTOM_SECURITY_GROUP_ID \
-#   --subnet-id $AWS_ID_SubredPublica \
-#   --private-ip-address $AWS_IP_Cliente \
-#   --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=SOR-CLIENTE}]' \
-#   --query 'Instances[0].InstanceId' \
-#   --output text)
+echo "Creando instancia CLIENTE..."
+AWS_AMI_ID=ami-07a53499a088e4a8c
+AWS_EC2_INSTANCE_ID2=$(aws ec2 run-instances \
+  --image-id $AWS_AMI_ID \
+  --instance-type t2.small \
+  --key-name "$AWS_Nombre_Clave" \
+  --user-data file://${BASEDIR}/UserDataCliente.txt \
+  --monitoring "Enabled=false" \
+  --security-group-ids $AWS_CUSTOM_SECURITY_GROUP_ID \
+  --subnet-id $AWS_ID_SubredPublica \
+  --private-ip-address $AWS_IP_Cliente \
+  --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value='$Nombre_Cliente'}]' \
+  --query 'Instances[0].InstanceId' \
+  --output text)
 
-# ##########################################################
-# ## Crear IP Estatica para la instancia CLIENTE. (IP elastica)
-# AWS_IP_Cliente=$(aws ec2 allocate-address --output text)
+##########################################################
+## Crear IP Estatica para la instancia CLIENTE. (IP elastica)
+AWS_IP_Cliente=$(aws ec2 allocate-address --output text)
  
-# ## Recuperar AllocationId de la IP elastica
-# AWS_IP_Fija_Cliente_AllocationId=$(echo $AWS_IP_Fija_Cliente | awk '{print $1}')
+## Recuperar AllocationId de la IP elastica
+AWS_IP_Fija_Cliente_AllocationId=$(echo $AWS_IP_Fija_Cliente | awk '{print $1}')
 
-# ## Añadirle etiqueta a la ip elástica de CLIENTE
-# aws ec2 create-tags \
-# --resources $AWS_IP_Fija_Cliente_AllocationId \
-# --tags "Key=Name,Value=SOR-CLIENTE-ip" 
+## Añadirle etiqueta a la ip elástica de CLIENTE
+aws ec2 create-tags \
+--resources $AWS_IP_Fija_Cliente_AllocationId \
+--tags "Key=Name,Value=SOR-CLIENTE-ip" 
 
 
 echo "Esperando a que las instancias estén disponibles para asociar IPs elásticas (80 segundos)"
@@ -282,8 +291,8 @@ sleep 80
 aws ec2 associate-address --instance-id $AWS_EC2_INSTANCE_ID --allocation-id $AWS_IP_Fija_Servidor_AllocationId 
 
 
-# ## Asociar la ip elastica a la instancia CLIENTE
-# aws ec2 associate-address --instance-id $AWS_EC2_INSTANCE_ID2 --allocation-id $AWS_IP_Fija_Cliente_AllocationId 
+## Asociar la ip elastica a la instancia CLIENTE
+aws ec2 associate-address --instance-id $AWS_EC2_INSTANCE_ID2 --allocation-id $AWS_IP_Fija_Cliente_AllocationId 
 
 
 ## Mostrar la ip publica de la instancia SERVIDOR
@@ -293,11 +302,11 @@ aws ec2 associate-address --instance-id $AWS_EC2_INSTANCE_ID --allocation-id $AW
  --output=text) &&
  echo "Creada instancia servidor con IP " $AWS_EC2_INSTANCE_PUBLIC_IP
 
-# ## Mostrar la ip publica de la instancia Cliente
-#  AWS_EC2_INSTANCE_PUBLIC_IP=$(aws ec2 describe-instances \
-#  --filters "Name=instance-id,Values="$AWS_EC2_INSTANCE_ID2 \
-#  --query "Reservations[*].Instances[*].PublicIpAddress" \
-#  --output=text) &&
-#  echo "Creada instancia cliente con IP " $AWS_EC2_INSTANCE_PUBLIC_IP
+## Mostrar la ip publica de la instancia Cliente
+ AWS_EC2_INSTANCE_PUBLIC_IP=$(aws ec2 describe-instances \
+ --filters "Name=instance-id,Values="$AWS_EC2_INSTANCE_ID2 \
+ --query "Reservations[*].Instances[*].PublicIpAddress" \
+ --output=text) &&
+ echo "Creada instancia cliente con IP " $AWS_EC2_INSTANCE_PUBLIC_IP
 
 
