@@ -1,0 +1,12 @@
+
+<powershell>
+
+
+#Abrimos las reglas del Firewall para permitir PING
+New-NetFirewallRule -DisplayName "Allow inbound ICMPv4" -Direction Inbound -Protocol ICMPv4 -IcmpType 8  -Action Allow
+New-NetFirewallRule -DisplayName "Allow inbound ICMPv6" -Direction Inbound -Protocol ICMPv6 -IcmpType 8  -Action Allow
+New-NetFirewallRule -DisplayName "Allow outbound ICMPv4" -Direction Outbound -Protocol ICMPv4 -IcmpType 8 -Action Allow
+New-NetFirewallRule -DisplayName "Allow outbound ICMPv6" -Direction Outbound -Protocol ICMPv6 -IcmpType 8 -Action Allow
+
+#Renombramos el servidor
+Rename-Computer -ComputerName  -NewName "CLIENTE-PROFE" 

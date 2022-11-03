@@ -42,6 +42,7 @@ Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManage
 choco install git.install -y
 echo "....Instalado choco y git...."
 
+Set-Location -Path "C:\Users\Administrator\Desktop" 
 
 #Clonamos el repositorio remoto
 echo "....Clonando repositorio remoto...."
@@ -50,10 +51,7 @@ if (Test-Path "SOR"){
     Remove-Item "SOR" -Recurse -Force
 }
 
-Start-Process git -ArgumentList 'clone $URL_REPOSITORIO'
-echo "Clonado repositorio remoto"
-pause
-
+Start-Process "C:\Program Files\Git\bin\git.exe"  -ArgumentList 'clone $URL_REPOSITORIO'
 echo "....Clonado repositorio remoto...."
 
 
@@ -65,7 +63,6 @@ $rutaScript= $PSScriptRoot+"\"+$script
  if($exists){
     Unregister-ScheduledTask -TaskName 'ConfiguraAD' -Confirm:$false
  }
-
 
 
 $Action = New-ScheduledTaskAction -Execute 'Powershell' -Argument "-NonInteractive -NoLogo -NoProfile -File $rutaScript $DNS_DOMINIO NETBIOS_DOMINIO"

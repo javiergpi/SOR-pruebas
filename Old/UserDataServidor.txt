@@ -1,0 +1,81 @@
+###########################################################
+#       UserDataServidor.txt
+#       Llamado desde CreaInfrastructuraCompletaPDC.sh
+#       Es el archivo que pasamos como UserData al servidor que será el PDC
+#       Las variables se rellenan desde dicho script.
+#  Autor: Javier González Pisano 
+#  Fecha: 02/11/2022
+###########################################################
+
+# Las variables importadas son:
+# SCRIPT_PDC
+# URL_REPOSITORIO
+# NETBIOS_DOMINIO
+# DNS_DOMINIO
+# ADMIN_SERVIDOR
+# PASSWORD_SERVIDOR
+
+
+#Abrimos las reglas del Firewall para permitir PING
+echo "1....Abriendo reglas de Firewall...."
+New-NetFirewallRule -DisplayName "Allow inbound ICMPv4" -Direction Inbound -Protocol ICMPv4 -IcmpType 8  -Action Allow
+New-NetFirewallRule -DisplayName "Allow inbound ICMPv6" -Direction Inbound -Protocol ICMPv6 -IcmpType 8  -Action Allow
+New-NetFirewallRule -DisplayName "Allow outbound ICMPv4" -Direction Outbound -Protocol ICMPv4 -IcmpType 8  -Action Allow
+New-NetFirewallRule -DisplayName "Allow outbound ICMPv6" -Direction Outbound -Protocol ICMPv6 -IcmpType 8  -Action Allow
+echo "....Abiertas reglas de Firewall...."
+
+
+
+#Instalamos rol AD
+echo "....Instalando rol AD...."
+Install-windowsfeature -name AD-Domain-Services -IncludeManagementTools
+echo "....Instalado rol AD...."
+
+echo "....Instalando choco y git...."
+# Modo unrestricted para powershell
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force
+
+# Instalamos Choco para la posterior instalación de Git
+Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')) 
+
+# Instalamos Git
+choco install git.install -y
+echo "....Instalado choco y git...."
+
+Set-Location -Path "C:\Users\Administrator\Desktop" 
+
+#Clonamos el repositorio remoto
+echo "....Clonando repositorio remoto...."
+ 
+if (Test-Path "SOR"){
+    Remove-Item "SOR" -Recurse -Force
+}
+
+Start-Process "C:\Program Files\Git\bin\git.exe"  -ArgumentList 'clone $URL_REPOSITORIO'
+echo "....Clonado repositorio remoto...."
+
+
+# Creamos tarea programada para promocionar a PDC tras reinicio"
+echo "....Registrando tarea programada...."
+$rutaScript= $PSScriptRoot+"\"+$script
+
+ $exists = Get-ScheduledTask | Where-Object {$_.TaskName -like 'ConfiguraAD'}
+ if($exists){
+    Unregister-ScheduledTask -TaskName 'ConfiguraAD' -Confirm:$false
+ }
+
+
+$Action = New-ScheduledTaskAction -Execute 'Powershell' -Argument "-NonInteractive -NoLogo -NoProfile -File $rutaScript $DNS_DOMINIO NETBIOS_DOMINIO"
+$Trigger = New-ScheduledTaskTrigger -AtLogon
+$Settings = New-ScheduledTaskSettingsSet
+$Task = New-ScheduledTask -Action $Action -Trigger $Trigger -Settings $Settings
+
+Register-ScheduledTask -TaskName 'ConfiguraAD' -InputObject $Task -User $ADMIN_SERVIDOR -Password $PASSWORD_SERVIDOR
+echo "Registrada tarea programada"
+
+#Renombramos el servidor
+echo "....Renombramos y reiniciamos...."
+
+Rename-Computer -NewName $NOMBRE_SERVIDOR 
+Restart-Computer 
+

@@ -1,8 +1,19 @@
+$DNS_DOMINIO=$args[0];
+$NETBIOS_DOMINIO=$args[1];
 
-# Script de promoción a PDC. 
-# Debería incluir las variables:
-#   - DNS_DOMINIO
-#   - NETBIOS_DOMINIO
+
+
+#Eliminamos el registro de la tarea programada
+ $exists = Get-ScheduledTask | Where-Object {$_.TaskName -like 'ConfiguraAD'}
+ if($exists){
+    Unregister-ScheduledTask -TaskName 'ConfiguraAD' -Confirm:$false
+ }
+
+
+#
+# Configuramos AD
+#
+
 Import-Module ADDSDeployment
 Install-ADDSForest `
 -CreateDnsDelegation:$false `
