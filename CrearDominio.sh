@@ -256,7 +256,7 @@ aws ec2 create-tags \
 --tags "Key=Name,Value=SOR-SERVIDOR-ip" 
 
 
-echo "Creando instancia CLIENTE..."
+echo "8. Creando instancia CLIENTE..."
 AWS_AMI_ID=ami-07a53499a088e4a8c
 AWS_EC2_INSTANCE_ID2=$(aws ec2 run-instances \
   --image-id $AWS_AMI_ID \
@@ -273,7 +273,7 @@ AWS_EC2_INSTANCE_ID2=$(aws ec2 run-instances \
 
 ##########################################################
 ## Crear IP Estatica para la instancia CLIENTE. (IP elastica)
-AWS_IP_Cliente=$(aws ec2 allocate-address --output text)
+AWS_IP_Fija_Cliente=$(aws ec2 allocate-address --output text)
  
 ## Recuperar AllocationId de la IP elastica
 AWS_IP_Fija_Cliente_AllocationId=$(echo $AWS_IP_Fija_Cliente | awk '{print $1}')
@@ -284,7 +284,7 @@ aws ec2 create-tags \
 --tags "Key=Name,Value=SOR-CLIENTE-ip" 
 
 
-echo "Esperando a que las instancias estén disponibles para asociar IPs elásticas (80 segundos)"
+echo "10. Esperando a que las instancias estén disponibles para asociar IPs elásticas (80 segundos)"
 sleep 80
 
 ## Asociar la ip elastica a la instancia SERVIDOR
@@ -300,13 +300,13 @@ aws ec2 associate-address --instance-id $AWS_EC2_INSTANCE_ID2 --allocation-id $A
  --filters "Name=instance-id,Values="$AWS_EC2_INSTANCE_ID \
  --query "Reservations[*].Instances[*].PublicIpAddress" \
  --output=text) &&
- echo "Creada instancia servidor con IP " $AWS_EC2_INSTANCE_PUBLIC_IP
+ echo "11. Creada instancia servidor con IP " $AWS_EC2_INSTANCE_PUBLIC_IP
 
 ## Mostrar la ip publica de la instancia Cliente
  AWS_EC2_INSTANCE_PUBLIC_IP=$(aws ec2 describe-instances \
  --filters "Name=instance-id,Values="$AWS_EC2_INSTANCE_ID2 \
  --query "Reservations[*].Instances[*].PublicIpAddress" \
  --output=text) &&
- echo "Creada instancia cliente con IP " $AWS_EC2_INSTANCE_PUBLIC_IP
+ echo "12. Creada instancia cliente con IP " $AWS_EC2_INSTANCE_PUBLIC_IP
 
 
