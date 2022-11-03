@@ -169,7 +169,7 @@ aws ec2 associate-dhcp-options --dhcp-options-id $AWS_DHCP_OPTIONS_ID --vpc-id $
 
 ###################################
 
-echo "Creando grupo de seguridad..."
+echo "6. Creando grupo de seguridad para las instancias..."
 ## Crear un grupo de seguridad
 aws ec2 create-security-group \
   --vpc-id $AWS_ID_VPC \
@@ -205,7 +205,7 @@ BASEDIR=$(cd $(dirname $0) && pwd)
 sed -i "1 i\$SCRIPT_PDC=\"${SCRIPT_PDC}\" \n" "${BASEDIR}/UserDataPDC.txt"
 # Extraemos el nombre del respositorio de la URL
   basename=$(basename $URL_Repositorio)
-  $Nombre_Repositorio=${basename%.*}
+  Nombre_Repositorio=${basename%.*}
 sed -i "1 i\$NOMBRE_REPOSITORIO=\"${Nombre_Repositorio}\" \n" "${BASEDIR}/UserDataPDC.txt"
 sed -i "1 i\$URL_REPOSITORIO=\"${URL_Repositorio}\" \n" "${BASEDIR}/UserDataPDC.txt"
 sed -i "1 i\$NETBIOS_DOMINIO=\"${NETBIOS_Dominio}\" \n" "${BASEDIR}/UserDataPDC.txt"
@@ -219,7 +219,7 @@ sed -i "$ a </powershell> \n"  "${BASEDIR}/UserDataPDC.txt"
 
 
 ## Crear una instancia EC2  (con una imagen Windows Server 2022 Base )
-echo "Creando instancia SERVIDOR..."
+echo "7. Creando instancia SERVIDOR..."
 AWS_AMI_ID=ami-07a53499a088e4a8c 
 AWS_EC2_INSTANCE_ID=$(aws ec2 run-instances \
   --image-id $AWS_AMI_ID \
@@ -230,9 +230,10 @@ AWS_EC2_INSTANCE_ID=$(aws ec2 run-instances \
   --security-group-ids $AWS_CUSTOM_SECURITY_GROUP_ID \
   --subnet-id $AWS_ID_SubredPublica \
   --private-ip-address $AWS_IP_Servidor \
-  --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=$Nombre_Servidor}]' \
+  --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=${Nombre_Servidor}}]' \
   --query 'Instances[0].InstanceId' \
   --output text)
+
 
 ##########################################################
 ## Crear IP Estatica para la instancia SERVIDOR. (IP elastica)
@@ -245,16 +246,6 @@ AWS_IP_Fija_Servidor_AllocationId=$(echo $AWS_IP_Fija_Servidor | awk '{print $1}
 aws ec2 create-tags \
 --resources $AWS_IP_Fija_Servidor_AllocationId \
 --tags "Key=Name,Value=SOR-SERVIDOR-ip" 
-
-## Asociar la ip elastica a la instancia SERVIDOR
-aws ec2 associate-address --instance-id $AWS_EC2_INSTANCE_ID --allocation-id $AWS_IP_Fija_Servidor_AllocationId 
-
-## Mostrar la ip publica de la instancia
- AWS_EC2_INSTANCE_PUBLIC_IP=$(aws ec2 describe-instances \
- --filters "Name=instance-id,Values="$AWS_EC2_INSTANCE_ID \
- --query "Reservations[*].Instances[*].PublicIpAddress" \
- --output=text) &&
- echo "Creada instancia servidor con IP " $AWS_EC2_INSTANCE_PUBLIC_IP
 
 
 # echo "Creando instancia CLIENTE..."
@@ -283,8 +274,24 @@ aws ec2 associate-address --instance-id $AWS_EC2_INSTANCE_ID --allocation-id $AW
 # --resources $AWS_IP_Fija_Cliente_AllocationId \
 # --tags "Key=Name,Value=SOR-CLIENTE-ip" 
 
+
+echo "Esperando a que las instancias estén disponibles para asociar IPs elásticas (80 segundos)"
+sleep 80
+
+## Asociar la ip elastica a la instancia SERVIDOR
+aws ec2 associate-address --instance-id $AWS_EC2_INSTANCE_ID --allocation-id $AWS_IP_Fija_Servidor_AllocationId 
+
+
 # ## Asociar la ip elastica a la instancia CLIENTE
 # aws ec2 associate-address --instance-id $AWS_EC2_INSTANCE_ID2 --allocation-id $AWS_IP_Fija_Cliente_AllocationId 
+
+
+## Mostrar la ip publica de la instancia SERVIDOR
+ AWS_EC2_INSTANCE_PUBLIC_IP=$(aws ec2 describe-instances \
+ --filters "Name=instance-id,Values="$AWS_EC2_INSTANCE_ID \
+ --query "Reservations[*].Instances[*].PublicIpAddress" \
+ --output=text) &&
+ echo "Creada instancia servidor con IP " $AWS_EC2_INSTANCE_PUBLIC_IP
 
 # ## Mostrar la ip publica de la instancia Cliente
 #  AWS_EC2_INSTANCE_PUBLIC_IP=$(aws ec2 describe-instances \
