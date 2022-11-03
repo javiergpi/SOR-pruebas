@@ -230,7 +230,7 @@ AWS_EC2_INSTANCE_ID=$(aws ec2 run-instances \
   --security-group-ids $AWS_CUSTOM_SECURITY_GROUP_ID \
   --subnet-id $AWS_ID_SubredPublica \
   --private-ip-address $AWS_IP_Servidor \
-  --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=${Nombre_Servidor}}]' \
+  --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value='+$Nombre_Servidor+'}]' \
   --query 'Instances[0].InstanceId' \
   --output text)
 
