@@ -1,8 +1,8 @@
 
-# Script de promoción a PDC. 
+# Script de unión a dominio. 
 # Debería incluir las variables:
 #   - DNS_DOMINIO
-#   - NETBIOS_DOMINIO
+
 
 Import-Module ADDSDeployment
 Install-ADDSForest `

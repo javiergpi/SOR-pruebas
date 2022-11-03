@@ -55,7 +55,7 @@ AWS_Nombre_Clave="javier"
 Nombre_Servidor="SERVIDOR-PROFE"
 
 #Nombre del CLIENTE (Cambia por tu número, ejemplo CLIENTE00-01)
-Nombre_Servidor="CLIENTEPROFE-01"
+Nombre_Cliente="CLIENTEPROFE-01"
 
 #Nombre DNS del dominio (cambia por tu número, ejemplo dominio00.local)
 DNS_Dominio="dominioprofe.local"
@@ -204,7 +204,7 @@ BASEDIR=$(cd $(dirname $0) && pwd)
 
 sed -i "1 i\$SCRIPT_PDC=\"${SCRIPT_PDC}\" \n" "${BASEDIR}/UserDataPDC.txt"
 # Extraemos el nombre del respositorio de la URL
-  basename=$(basename $URL_REPOSITORIO)
+  basename=$(basename $URL_Repositorio)
   $Nombre_Repositorio=${basename%.*}
 sed -i "1 i\$NOMBRE_REPOSITORIO=\"${Nombre_Repositorio}\" \n" "${BASEDIR}/UserDataPDC.txt"
 sed -i "1 i\$URL_REPOSITORIO=\"${URL_Repositorio}\" \n" "${BASEDIR}/UserDataPDC.txt"
@@ -225,12 +225,12 @@ AWS_EC2_INSTANCE_ID=$(aws ec2 run-instances \
   --image-id $AWS_AMI_ID \
   --instance-type t2.medium \
   --key-name $AWS_Nombre_Clave \
-  --user-data file://${BASEDIR}/UserDataServidor.txt \
+  --user-data file://${BASEDIR}/UserDataPDC.txt \
   --monitoring "Enabled=false" \
   --security-group-ids $AWS_CUSTOM_SECURITY_GROUP_ID \
   --subnet-id $AWS_ID_SubredPublica \
   --private-ip-address $AWS_IP_Servidor \
-  --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=SOR-SERVIDOR}]' \
+  --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=$Nombre_Servidor}]' \
   --query 'Instances[0].InstanceId' \
   --output text)
 
