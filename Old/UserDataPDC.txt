@@ -57,7 +57,7 @@ echo "....Clonado repositorio remoto...."
 
 # Creamos tarea programada para promocionar a PDC tras reinicio"
 echo "....Registrando tarea programada...."
-$rutaScript= $PSScriptRoot+"\"+$script
+$rutaScript= $PSScriptRoot+"\"+$SCRIPT_PDC
 
  $exists = Get-ScheduledTask | Where-Object {$_.TaskName -like 'ConfiguraAD'}
  if($exists){
@@ -70,7 +70,7 @@ $Trigger = New-ScheduledTaskTrigger -AtLogon
 $Settings = New-ScheduledTaskSettingsSet
 $Task = New-ScheduledTask -Action $Action -Trigger $Trigger -Settings $Settings
 
-Register-ScheduledTask -TaskName 'ConfiguraAD' -InputObject $Task -User $ADMIN_SERVIDOR -Password $PASSWORD_SERVIDOR
+Register-ScheduledTask -TaskName 'ConfiguraAD' -InputObject $Task -User  -Password $PASSWORD_SERVIDOR
 echo "Registrada tarea programada"
 
 #Renombramos el servidor

@@ -1,21 +1,32 @@
 ###########################################################
 #    Termina todas las instancias 
 #  Autor: Javier González Pisano 
-#  Fecha: 29/10/2022
+#  Fecha: 06/10/2022
 ###########################################################
 
 
 # Borra todas las instancias
-  aws ec2 describe-instances --filters "Name=instance-state-name, Values=running" | \
-    jq -r .Reservations[].Instances[].InstanceId | \
-      xargs -L 1 -I {} aws ec2 modify-instance-attribute \
-        --no-disable-api-termination \
-        --instance-id {}
-  aws ec2 describe-instances  | \
-    jq -r .Reservations[].Instances[].InstanceId | \
-      xargs -L 1 -I {} aws ec2 terminate-instances \
-        --instance-id {}
+echo ".....1.Borrando instancias..."
+aws ec2 terminate-instances 
+        --instance-ids 
+         $(
+          aws ec2 describe-instances 
+            | grep InstanceId 
+            | awk {'print $2'} 
+            | sed 's/[",]//g'
+          )
+sleep 2
+echo ".....1. Borradas instancias..."
 
+# Liberamos IPs elásticas no usadas
+echo ".....2.Liberando IPs elásticas..."
+aws ec2 describe-addresses --query 'Addresses[].[AllocationId,AssociationId]' --output text | \
+awk '$2 == "None" { print $1 }' | \
+xargs -I {} aws ec2 release-address --allocation-id {} 
+echo ".....2.Liberadas IPs elásticas..."
+
+# Eliminamos todas las VPC menos la VPC por defecto
+echo ".....3.Eliminando VPCs..."
 
 
 #  # get default vpc

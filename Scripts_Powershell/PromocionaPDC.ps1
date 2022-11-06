@@ -1,8 +1,9 @@
 
 # Script de promoción a PDC. 
-# Debería incluir las variables:
-#   - DNS_DOMINIO
-#   - NETBIOS_DOMINIO
+
+$DNS_DOMINIO=$args[0];
+$NETBIOS_DOMINIO=$args[1];
+
 
 Import-Module ADDSDeployment
 Install-ADDSForest `
