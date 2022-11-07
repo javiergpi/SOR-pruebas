@@ -69,12 +69,13 @@ Add-LocalGroupMember -Group "Administrators" -Member "admin_programada" -ErrorAc
 echo "6. Creado usuario admin tarea programada...."
 
 echo "7. Registrando tarea programada...."
+Start-Sleep -Seconds 20
 
 $rutaScript=  "C:\Users\Administrator\Desktop\$NOMBRE_REPOSITORIO\Scripts_Powershell\$SCRIPT_CLIENTE"
 
  $exists = Get-ScheduledTask | Where-Object {$_.TaskName -like 'UneDominio'}
  if($exists){
-    Unregister-ScheduledTask -TaskName 'Dominio' -Confirm:$false
+    Unregister-ScheduledTask -TaskName 'UneDominio' -Confirm:$false
  }
 
 

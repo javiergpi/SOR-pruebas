@@ -6,11 +6,11 @@ Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force
 $DNS_DOMINIO=$args[0];
 $NOMBRE_SERVIDOR=$args[1];
 
-#Eliminamos el registro de la tarea programada
-$exists = Get-ScheduledTask | Where-Object {$_.TaskName -like 'UneDominio'}
-if($exists){
-   Unregister-ScheduledTask -TaskName 'UneDominio' -Confirm:$false
-}
+# #Eliminamos el registro de la tarea programada
+# $exists = Get-ScheduledTask | Where-Object {$_.TaskName -like 'UneDominio'}
+# if($exists){
+#    Unregister-ScheduledTask -TaskName 'UneDominio' -Confirm:$false
+# }
 
 #Eliminamos al usuario usado para la tarea programada 
 # Remove-LocalUser -Name "admin_programada"
