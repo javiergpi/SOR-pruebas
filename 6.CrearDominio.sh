@@ -250,6 +250,7 @@ sed -i "1 i\$SCRIPT_CLIENTE=\"${Script_Cliente}\" \n" "${BASEDIR}/UserDataClient
 sed -i "1 i\$NOMBRE_REPOSITORIO=\"${Nombre_Repositorio}\" \n" "${BASEDIR}/UserDataCliente.txt"
 sed -i "1 i\$URL_REPOSITORIO=\"${URL_Repositorio}\" \n" "${BASEDIR}/UserDataCliente.txt"
 sed -i "1 i\$DNS_DOMINIO=\"${DNS_Dominio}\" \n" "${BASEDIR}/UserDataCliente.txt"
+sed -i "1 i\$NOMBRE_SERVIDOR=\"${Nombre_Servidor}\" \n" "${BASEDIR}/UserDataCliente.txt"
 sed -i "1 i\$NOMBRE_CLIENTE=\"${Nombre_Cliente}\" \n" "${BASEDIR}/UserDataCliente.txt"
 sed -i '1s/^/<powershell> \n /' "${BASEDIR}/UserDataCliente.txt"
 sed -i "$ a </powershell> \n"  "${BASEDIR}/UserDataCliente.txt"
