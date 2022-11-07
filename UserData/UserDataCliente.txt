@@ -10,6 +10,7 @@
 #           - URL_REPOSITORIO
 #           - DNS_DOMINIO
 #           - NOMBRE_CLIENTE
+#           - NOMBRE_SERVIDOR
 #
 #  Autor: Javier González Pisano 
 #  Fecha: 02/11/2022
@@ -50,6 +51,7 @@ Set-Location -Path "C:\Users\Administrator\Desktop\$NOMBRE_REPOSITORIO\Scripts_P
 echo "5...Personalizando script de unión a dominio...."
 
 "`$DNS_DOMINIO=`"$DNS_DOMINIO`" `n"  + (Get-Content "$SCRIPT_CLIENTE" -Raw) | Set-Content "$SCRIPT_CLIENTE"
+"`$NOMBRE_SERVIDOR=`"$NOMBRE_SERVIDOR`" `n"  + (Get-Content "$SCRIPT_CLIENTE" -Raw) | Set-Content "$SCRIPT_CLIENTE"
 
 echo "5...Personalizado script de unión a PDC...."
 

@@ -12,7 +12,7 @@ if($exists){
 }
 
 #Eliminamos al usuario usado para la tarea programada 
-Remove-LocalUser -Name "admin_programada"
+# Remove-LocalUser -Name "admin_programada"
 
 
 
