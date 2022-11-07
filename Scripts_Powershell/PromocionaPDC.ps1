@@ -5,6 +5,18 @@ $DNS_DOMINIO=$args[0];
 $NETBIOS_DOMINIO=$args[1];
 
 
+#Eliminamos el registro de la tarea programada
+$exists = Get-ScheduledTask | Where-Object {$_.TaskName -like 'ConfiguraAD'}
+if($exists){
+   Unregister-ScheduledTask -TaskName 'PromocionaPDC' -Confirm:$false
+}
+
+#Eliminamos al usuario usado para la tarea programada 
+Remove-LocalUser -Name "admin_programada"
+
+
+
+
 Import-Module ADDSDeployment
 Install-ADDSForest `
 -CreateDnsDelegation:$false `
