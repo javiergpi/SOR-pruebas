@@ -44,7 +44,7 @@ echo "4....Clonando repositorio remoto...."
 
 Start-Process "C:\Program Files\Git\bin\git.exe"  -ArgumentList "clone $URL_REPOSITORIO"
 echo "4....Clonado repositorio remoto...."
-Start-Sleep -Seconds 1.5
+Start-Sleep -Seconds 5
 
 Set-Location -Path "C:\Users\Administrator\Desktop\$NOMBRE_REPOSITORIO\Scripts_Powershell" 
 

@@ -6,7 +6,7 @@ $NETBIOS_DOMINIO=$args[1];
 
 
 #Eliminamos el registro de la tarea programada
-$exists = Get-ScheduledTask | Where-Object {$_.TaskName -like 'ConfiguraAD'}
+$exists = Get-ScheduledTask | Where-Object {$_.TaskName -like 'PromocionaPDC'}
 if($exists){
    Unregister-ScheduledTask -TaskName 'PromocionaPDC' -Confirm:$false
 }

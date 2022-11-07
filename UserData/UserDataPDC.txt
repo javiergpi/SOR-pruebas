@@ -86,7 +86,7 @@ $rutaScript=  "C:\Users\Administrator\Desktop\$NOMBRE_REPOSITORIO\Scripts_Powers
 
 
 $Action = New-ScheduledTaskAction -Execute 'Powershell' -Argument "-NonInteractive -NoLogo -NoProfile -File $rutaScript $DNS_DOMINIO $NETBIOS_DOMINIO"
-$Trigger = New-ScheduledTaskTrigger -AtLogon
+$Trigger = New-ScheduledTaskTrigger -AtStartup
 $Settings = New-ScheduledTaskSettingsSet
 $Task = New-ScheduledTask -Action $Action -Trigger $Trigger -Settings $Settings
 
