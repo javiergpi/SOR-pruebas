@@ -341,3 +341,12 @@ aws ec2 associate-address --instance-id $AWS_EC2_INSTANCE_ID2 --allocation-id $A
  echo "11. Creada instancia cliente con IP " $AWS_EC2_INSTANCE_PUBLIC_IP
 
 
+echo "12. Las instancias se están configurando. Este proceso podría llevar hasta 10 minutos..."
+echo "12.1. Instalando rol de AD en $Nombre_Servidor..."
+sleep 300
+echo "12.2. Promocionando $NNombre_Servidor a Controlador de dominio..."
+sleep 200
+echo "12.3. Agreando $Nombre_Cliente al dominio..."
+sleep 100
+echo "12. Las instancias ya se han configurado. "
+

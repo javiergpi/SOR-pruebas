@@ -31,4 +31,5 @@ $username="admin_programada"
 $password = ConvertTo-SecureString "Naranco.22" -AsPlainText -Force
 $Credenciales = new-object -typename System.Management.Automation.PSCredential -argumentlist $username, $password
 
-Add-Computer -DomainName $DNS_DOMINIO -cred $Credenciales
+Add-Computer -DomainName $DNS_DOMINIO -cred $Credenciales -Restart
+
